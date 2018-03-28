@@ -1,0 +1,38 @@
+{
+  "name": "Show Locking Language",
+
+  "namespace": "Vanderbilt\\ShowLockingLanguageExternalModule",
+
+  "authors": [
+    {
+      "name": "Ryan Moore",
+      "email": "datacore@vanderbilt.edu",
+      "institution": "Vanderbilt University Medical Center"
+    }
+  ],
+
+  "description": "Display locking language at the bottom of locked data entry forms for all users, not just those with Locking User Rights.",
+
+  "permissions": [
+    "redcap_data_entry_form"
+  ],
+
+  "links": {
+    "project": [
+    ]
+  },
+
+  "no-auth-pages":[""],
+
+  "project-settings": [
+  ],
+
+  "system-settings": [
+  ],
+  "compatibility": {
+    "php-version-min": "5.5.0",
+    "php-version-max": "",
+    "redcap-version-min": "8.0.0",
+    "redcap-version-max": ""
+  }
+}
