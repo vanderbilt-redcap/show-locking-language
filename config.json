@@ -25,6 +25,11 @@
   "no-auth-pages":[""],
 
   "project-settings": [
+    {
+      "key": "show_history",
+      "name": "Create History Popup for Locking and Esignatures",
+      "type": "checkbox"
+    }
   ],
 
   "system-settings": [
