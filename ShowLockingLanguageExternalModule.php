@@ -30,8 +30,8 @@ class ShowLockingLanguageExternalModule extends AbstractExternalModule
 
 			#If the element that typically displays locking information is not present, create it and place it in the usual location on the data form
 			echo "<script>";
-			echo "$(document).ready(function() {
-				".$this->generateJavascriptFunctions()."
+			echo $this->generateJavascriptFunctions()."
+				$(document).ready(function() {
 				if ($('#__LOCKRECORD__-tr').length == 0) {
 					$('#" . $instrument . "_complete-tr').after('<tr id=\"__LOCKRECORD__-tr\" sq_id=\"__LOCKRECORD__\">
 						<td class=\"labelrc col-xs-7\"><label class=\"fl\" id=\"label-__LOCKRECORD__\" aria-hidden=\"true\"><div style=\"color:#A86700;\">" . $lockData[$record]['label'] . "</div></label></td><td class=\"data col-xs-5\" style=\"padding:5px;\"><div id=\"lockingts\">".($showHistory == "1" ? "<a style=\"padding-right:5px;cursor:pointer;\" href=\"javascript:;\" tabindex=\'-1\' id=\"vcc_module_lock_history\" title=\"View Locking History\" onmouseover=\"dh1(this)\" onmouseout=\"dh2(this)\"><img src=\'".APP_PATH_IMAGES."history.png\'></a><br/><a title=\"View Locking Comment Log\" id=\"vcc_module_locking_data_res\" href=\"javascript:;\" tabindex=\"-1\"><img src=\"".APP_PATH_IMAGES."balloon_left_bw2.gif\" /></a>" : "")."<b>Locked</b> <b>by " . $lockData[$record]['username'] . "</b> (" . $lockData[$record]['realname'] . ") on " . date("m/d/Y h:ia", strtotime($lockData[$record]['timestamp'])) . "</div>" . ($esigData[$record]['esign_id'] != '' ? "<div id=\"esignts\">".($showHistory == "1" ? "<a style=\"padding-right:5px;cursor:pointer;\" href=\"javascript:;\" tabindex=\'-1\' id=\"vcc_module_esig_history\" title=\"View E-Signature History\" onmouseover=\"dh1(this)\" onmouseout=\"dh2(this)\"><img src=\'".APP_PATH_IMAGES."history.png\'></a><br/><a id=\"vcc_module_esig_data_res\" href=\"javascript:;\" title=\"View Esignature Comment Log\" tabindex=\"-1\"><img src=\"".APP_PATH_IMAGES."balloon_left_bw2.gif\" /></a>" : "")."<b>E-signed by " . $esigData[$record]['username'] . "</b> (" . $esigData[$record]['realname'] . ") on " . date("m/d/Y h:ia", strtotime($esigData[$record]['timestamp'])) . "</div>" : "") . "</td></tr>');
@@ -60,8 +60,8 @@ class ShowLockingLanguageExternalModule extends AbstractExternalModule
 		// If the form is not locked but we want to see the locking history, need to add them to the existing lock/unlock div
 		elseif ($showHistory == "1") {
 			echo "<script>";
-				echo "$(document).ready(function() {
-					".$this->generateJavascriptFunctions()."
+				echo $this->generateJavascriptFunctions()."
+					$(document).ready(function() {
 					$('#__LOCKRECORD__').before('<a style=\"padding-right:8px;cursor:pointer;\" tabindex=\'-1\' id=\"vcc_module_lock_history\" title=\"View Locking History\" onmouseover=\"dh1(this)\" onmouseout=\"dh2(this)\"><img src=\'".APP_PATH_IMAGES."history.png\'></a><br/><a title=\"View Locking Comment Log\" id=\"vcc_module_lock_data_res\" tabindex=\"-1\"><img src=\"".APP_PATH_IMAGES."balloon_left_bw2.gif\" /></a>');
 					$('#esignchk').prepend('<a style=\"padding-right:5px;cursor:pointer;\" tabindex=\'-1\' id=\"vcc_module_esig_history\" title=\"View E-Signature History\" onmouseover=\"dh1(this)\" onmouseout=\"dh2(this)\"><img src=\'".APP_PATH_IMAGES."history.png\'></a><br/><a id=\"vcc_module_esig_data_res\" title=\"View Esignature Comment Log\" tabindex=\"-1\"><img src=\"".APP_PATH_IMAGES."balloon_left_bw2.gif\" /></a>');
 				
