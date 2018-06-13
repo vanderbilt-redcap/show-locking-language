@@ -176,7 +176,6 @@ class ShowLockingLanguageExternalModule extends AbstractExternalModule
 							}
 						});
 					}
-				});
 				function lockResPopup(field,event_id,record,existing_record,rule_id,instance,pid) {
 						if (typeof instance == \"undefined\") instance = 1;
 						if (record == null) record = getParameterByName('id');
