@@ -39,7 +39,7 @@ class LockDataQuality extends \DataQuality
 				$fieldsInLogic = array_keys(getBracketedFields($this->rules[$rule_id]['logic'], true, true, true));
 				$dh_history = array();
 				foreach ($fieldsInLogic as $thisDhField) {
-					$dh_history_temp = Form::getDataHistoryLog($record, $event_id, $thisDhField, $instance);
+					$dh_history_temp = \Form::getDataHistoryLog($record, $event_id, $thisDhField, $instance);
 					// Reformat data values so that it is formatted as "field_name = "data values""
 					foreach ($dh_history_temp as &$attr) {
 						if ($Proj->isCheckbox($thisDhField)) $attr['value'] = nl2br(str_replace("\n\n", "\n", trim(br2nl($attr['value']))));
@@ -54,7 +54,7 @@ class LockDataQuality extends \DataQuality
 				foreach ($dh_history as $attr) $dh_datetimes[] = $attr['ts'];
 				array_multisort($dh_datetimes, SORT_REGULAR, $dh_history);
 			} else {
-				$dh_history = Form::getDataHistoryLog($record, $event_id, $field, $instance);
+				$dh_history = \Form::getDataHistoryLog($record, $event_id, $field, $instance);
 				// Reformat data values so that it is formatted as "field_name = "data values""
 				foreach ($dh_history as &$attr) {
 					if ($Proj->isCheckbox($field)) $attr['value'] = nl2br(str_replace("\n\n", "\n", trim(br2nl($attr['value']))));
