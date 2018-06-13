@@ -55,6 +55,7 @@ class ShowLockingLanguageExternalModule extends AbstractExternalModule
 				$('#__LOCKRECORD__-tr').css('display','table-row');";
 
 				$this->generateJavascriptFunctions();
+			echo "});";
 			echo "</script>";
 		}
 		// If the form is not locked but we want to see the locking history, need to add them to the existing lock/unlock div
@@ -80,6 +81,7 @@ class ShowLockingLanguageExternalModule extends AbstractExternalModule
 					
 					$('#__LOCKRECORD__-tr').css('display','table-row');";
 				$this->generateJavascriptFunctions();
+				echo "});";
 			echo "</script>";
 		}
 	}
