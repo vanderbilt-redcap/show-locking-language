@@ -7,7 +7,7 @@
  */
 ##################################################################################################################
 # This page has the functionality for both viewing and saving the Data Resolution popup for the locking/esignature
-# history and saving. This is largely a retooled dataResolutionPopup.php file from REDCap.
+# history. This is largely a retooled dataResolutionPopup.php file from REDCap.
 ##################################################################################################################
 
 require_once('LockDataQuality.php');

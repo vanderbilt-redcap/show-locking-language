@@ -9,6 +9,7 @@
 # This class is an extension of the DataQuality REDCap class, mainly being used to generate our own Data Quality
 # popup, and being used to bypass the pesky checks REDCap does to make sure you're trying to do data quality on
 # a field in the project. The logging/esignature checks don't have field names in the project, so we make our own
+# functions
 ##################################################################################################################
 
 namespace Vanderbilt\ShowLockingLanguageExternalModule;
@@ -16,10 +17,19 @@ namespace Vanderbilt\ShowLockingLanguageExternalModule;
 class LockDataQuality extends \DataQuality
 {
 	private $rules = null;
-	// Display data resolution history in table format
+	/*
+	 * Display data resolution history in table format
+	 * @param $record Record ID of the record being examined
+	 * @param $event_id Event ID of the form.
+	 * @param $field Field that we're looking for the data resolution or comment log for. Will be 'locking_data_resolution' or 'esignature_data_resolution'
+	 * @param $rule_id For our purposes will always be empty, as there's no ability to define data rules on these 'fields'
+	 * @param $instance Instance ID of the form.
+	 * @return Array with keys of record ID, and elements of ld_id ('Lock ID'), timestamp (when locking happened), label (custom label for locking, if present), username (User Name of person who performed lock), realName (Real name of the user who locked)
+	 */
 	public function displayFieldDataResHistory($record, $event_id, $field, $rule_id='', $instance=1)
 	{
 		global $longitudinal, $lang, $table_pk_label, $Proj, $user_rights, $data_resolution_enabled, $double_data_entry, $field_comment_edit_delete;
+		$lockModuleLang = parse_ini_file("lock_module_language.ini");
 
 		// append --# if DDE user
 		$record .= ($double_data_entry && $user_rights['double_data'] != 0) ? "--".$user_rights['double_data'] : "";
@@ -58,7 +68,7 @@ class LockDataQuality extends \DataQuality
 				// Reformat data values so that it is formatted as "field_name = "data values""
 				foreach ($dh_history as &$attr) {
 					if ($Proj->isCheckbox($field)) $attr['value'] = nl2br(str_replace("\n\n", "\n", trim(br2nl($attr['value']))));
-					$attr['value'] = "$field = '{$attr['value']}'";
+					$attr['value'] = ($field == 'esignature_data_resolution' ? "E-Signature" : "Locking")."= '{$attr['value']}'";
 				}
 				unset($attr);
 			}
@@ -115,8 +125,7 @@ class LockDataQuality extends \DataQuality
 		$fieldNameLabel = '';
 		if ($field != '') {
 			$fieldNameLabel = \RCView::div('',
-				"{$lang['graphical_view_23']}{$lang['colon']} <b>$field</b>
-								(\"" . strip_tags($Proj->metadata[$field]['element_label']) . "\") "
+				"{$lang['graphical_view_23']}{$lang['colon']} <b>".($field == "esignature_data_resolution" ? "E-Signature" : "Locking")."</b>"
 			);
 		}
 		// Set string for field name/label
@@ -181,12 +190,9 @@ class LockDataQuality extends \DataQuality
 						$lang['global_80'] . " " . $lang['dataqueries_137']
 					)
 				) .
-				$lang['dataqueries_129']
+				$lockModuleLang['lock_module_dataqueries_1']
 				: 	// Field Comment Log instructions
-				$lang['dataqueries_154'] . " " .
-				\RCView::a(array('href'=>APP_PATH_WEBROOT."DataQuality/field_comment_log.php?pid=".PROJECT_ID,
-					'style'=>"text-decoration:underline;"), $lang['dataqueries_141']) . " " .
-				$lang['dataqueries_258'] .
+				$lockModuleLang['lock_module_dataqueries_2'] . " " .
 				// Add note about disabling editing/deleting field comments
 				(($data_resolution_enabled == '1' && $field_comment_edit_delete) ? " " .
 					\RCView::span(array('style'=>'color:#800000;'), $lang['dataqueries_287']) : '')

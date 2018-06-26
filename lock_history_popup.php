@@ -9,7 +9,7 @@
 # This file is a modified version of the file in REDCap that handles a field's history popups. This page is to
 # get around the REDCap file performing checks to make sure you're trying to get the history for a field on the
 # REDCap project, and the locking/esignature values don't count. We can simply re-use the same popup REDCap does
-# since we're only displaying history and are not providing ways to save things.
+# since we're only displaying history and don't need to change any defaults REDCap sets up for the popup.
 ###############################################################################################################
 
 global $lang, $require_change_reason;
@@ -19,6 +19,7 @@ $project_id = $_POST['pid'];
 $record = db_escape($_POST['record']);
 $event_id = $_POST['event_id'];
 $lockType = $_POST['type'];
+$lockModuleLang = parse_ini_file("lock_module_language.ini");
 // Set $instance
 $instance = is_numeric($_POST['instance']) ? (int)$_POST : 1;
 // Get data history log

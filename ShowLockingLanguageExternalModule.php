@@ -14,6 +14,14 @@ use ExternalModules\ExternalModules;
 class ShowLockingLanguageExternalModule extends AbstractExternalModule
 {
 	function redcap_data_entry_form($project_id, $record, $instrument, $event_id, $group_id = NULL, $repeat_instance = 1) {
+		global $user_rights;
+		$showLock = $this->getProjectSetting('show_lock');
+		if ($showLock == "0" && $user_rights['lock_record'] == "0") return;
+
+		#Get the icons that correspond to the comment log / data resolution for the lock and esignature. Only relevent if the module is set to show the history and comment logs for these.
+		$lockIcon = $this->getCommentLogIcon($project_id,$record,$event_id,'locking_data_resolution',$repeat_instance);
+		$esigIcon = $this->getCommentLogIcon($project_id,$record,$event_id,'esignature_data_resolution',$repeat_instance);
+		#Determine if the module needs to show the comment log / data resolution and locking/esingature history on the data entry forms.
 		$showHistory = $this->getProjectSetting('show_history');
 		#Get the lock data for the form for this record,event,instance
 		$lockData = $this->getFormLockData($project_id,$instrument,$record,$event_id,$repeat_instance);
@@ -33,11 +41,11 @@ class ShowLockingLanguageExternalModule extends AbstractExternalModule
 			echo $this->generateJavascriptFunctions()."
 				$(document).ready(function() {
 				if ($('#__LOCKRECORD__-tr').length == 0) {
-					$('#" . $instrument . "_complete-tr').after('<tr id=\"__LOCKRECORD__-tr\" sq_id=\"__LOCKRECORD__\"><td class=\"labelrc col-xs-7\"><label class=\"fl\" id=\"label-__LOCKRECORD__\" aria-hidden=\"true\"><div style=\"color:#A86700;\">" . $lockData[$record]['label'] . "</div></label></td><td class=\"data col-xs-5\" style=\"padding:5px;\"><div id=\"lockingts\">".($showHistory == "1" ? "<a style=\"padding-right:5px;cursor:pointer;\" href=\"javascript:;\" tabindex=\'-1\' id=\"vcc_module_lock_history\" title=\"View Locking History\" onmouseover=\"dh1(this)\" onmouseout=\"dh2(this)\"><img src=\'".APP_PATH_IMAGES."history.png\'></a><br/><a title=\"View Locking Comment Log\" id=\"vcc_module_lock_data_res\" href=\"javascript:;\" tabindex=\"-1\"><img src=\"".APP_PATH_IMAGES."balloon_left_bw2.gif\" /></a>" : "")."<b>Locked</b> <b>by " . $lockData[$record]['username'] . "</b> (" . $lockData[$record]['realname'] . ") on " . date("m/d/Y h:ia", strtotime($lockData[$record]['timestamp'])) . "</div>" . ($esigData[$record]['esign_id'] != '' ? "<div id=\"esignts\">".($showHistory == "1" ? "<a style=\"padding-right:5px;cursor:pointer;\" href=\"javascript:;\" tabindex=\'-1\' id=\"vcc_module_esig_history\" title=\"View E-Signature History\" onmouseover=\"dh1(this)\" onmouseout=\"dh2(this)\"><img src=\'".APP_PATH_IMAGES."history.png\'></a><br/><a id=\"vcc_module_esig_data_res\" href=\"javascript:;\" title=\"View Esignature Comment Log\" tabindex=\"-1\"><img src=\"".APP_PATH_IMAGES."balloon_left_bw2.gif\" /></a>" : "")."<b>E-signed by " . $esigData[$record]['username'] . "</b> (" . $esigData[$record]['realname'] . ") on " . date("m/d/Y h:ia", strtotime($esigData[$record]['timestamp'])) . "</div>" : "") . "</td></tr>');
+					$('#" . $instrument . "_complete-tr').after('<tr id=\"__LOCKRECORD__-tr\" sq_id=\"__LOCKRECORD__\"><td class=\"labelrc col-xs-7\"><label class=\"fl\" id=\"label-__LOCKRECORD__\" aria-hidden=\"true\"><div style=\"color:#A86700;\">" . $lockData[$record]['label'] . "</div></label></td><td class=\"data col-xs-5\" style=\"padding:5px;\"><div id=\"lockingts\">".($showHistory == "1" ? "<div style=\"display:table-cell;padding-right:5px;\"><a style=\"padding-right:5px;cursor:pointer;\" href=\"javascript:;\" tabindex=\'-1\' id=\"vcc_module_lock_history\" title=\"View Locking History\" onmouseover=\"dh1(this)\" onmouseout=\"dh2(this)\"><img src=\'".APP_PATH_IMAGES."history.png\'></a><br/><a title=\"View Locking Comment Log\" id=\"vcc_module_lock_data_res\" href=\"javascript:;\" tabindex=\"-1\"><img src=\"".APP_PATH_IMAGES.$lockIcon."\" /></a></div>" : "")."<div style=\"display:table-cell;\"><b>Locked</b> <b>by " . $lockData[$record]['username'] . "</b> (" . $lockData[$record]['realname'] . ") on " . date("m/d/Y h:ia", strtotime($lockData[$record]['timestamp'])) . "</div></div>" . ($esigData[$record]['esign_id'] != '' ? "<div id=\"esignts\">".($showHistory == "1" ? "<div style=\"display:table-cell;padding-right:5px;\"><a style=\"padding-right:5px;cursor:pointer;\" href=\"javascript:;\" tabindex=\'-1\' id=\"vcc_module_esig_history\" title=\"View E-Signature History\" onmouseover=\"dh1(this)\" onmouseout=\"dh2(this)\"><img src=\'".APP_PATH_IMAGES."history.png\'></a><br/><a id=\"vcc_module_esig_data_res\" href=\"javascript:;\" title=\"View Esignature Comment Log\" tabindex=\"-1\"><img src=\"".APP_PATH_IMAGES.$esigIcon."\" /></a></div>" : "")."<div style=\"display:table-cell;\"><b>E-signed by " . $esigData[$record]['username'] . "</b> (" . $esigData[$record]['realname'] . ") on " . date("m/d/Y h:ia", strtotime($esigData[$record]['timestamp'])) . "</div></div>" : "") . "</td></tr>');
 				}
 				else {
-					$('#lockingts').prepend('".($showHistory == "1" ? "<a style=\"padding-right:5px;cursor:pointer;\" tabindex=\'-1\' id=\"vcc_module_lock_history\" title=\"View Locking History\" onmouseover=\"dh1(this)\" onmouseout=\"dh2(this)\"><img src=\'".APP_PATH_IMAGES."history.png\'></a><br/><a title=\"View Locking Comment Log\" id=\"vcc_module_lock_data_res\" href=\"javascript:;\" tabindex=\"-1\"><img src=\"".APP_PATH_IMAGES."balloon_left_bw2.gif\" /></a>" : "")."');
-					$('#esignts').prepend('".($showHistory == "1" ? "<a style=\"padding-right:5px;cursor:pointer;\" tabindex=\'-1\' id=\"vcc_module_esig_history\" title=\"View E-Signature History\" onmouseover=\"dh1(this)\" onmouseout=\"dh2(this)\"><img src=\'".APP_PATH_IMAGES."history.png\'></a><br/><a id=\"vcc_module_esig_data_res\" href=\"javascript:;\" title=\"View Esignature Comment Log\" tabindex=\"-1\"><img src=\"".APP_PATH_IMAGES."balloon_left_bw2.gif\" /></a>" : "")."');
+					$('#__LOCKRECORD__').before('".($showHistory == "1" ? "<div style=\"display:inline-block;padding-right:5px;\"><a style=\"padding-right:5px;cursor:pointer;\" tabindex=\'-1\' id=\"vcc_module_lock_history\" title=\"View Locking History\" onmouseover=\"dh1(this)\" onmouseout=\"dh2(this)\"><img src=\'".APP_PATH_IMAGES."history.png\'></a><br/><a title=\"View Locking Comment Log\" id=\"vcc_module_lock_data_res\" href=\"javascript:;\" tabindex=\"-1\"><img src=\"".APP_PATH_IMAGES.$lockIcon."\" /></a></div>" : "")."');
+					$('#__ESIGNATURE__').before('".($showHistory == "1" ? "<div style=\"display:inline-block;padding-right:5px;\"><a style=\"padding-right:5px;cursor:pointer;\" tabindex=\'-1\' id=\"vcc_module_esig_history\" title=\"View E-Signature History\" onmouseover=\"dh1(this)\" onmouseout=\"dh2(this)\"><img src=\'".APP_PATH_IMAGES."history.png\'></a><br/><a id=\"vcc_module_esig_data_res\" href=\"javascript:;\" title=\"View Esignature Comment Log\" tabindex=\"-1\"><img src=\"".APP_PATH_IMAGES.$esigIcon."\" /></a></div>" : "")."');
 				}
 				$(\"#vcc_module_lock_history\").click(function () {
 					lockHist(\"locking\",\"$record\",$event_id,$repeat_instance,$project_id);
@@ -61,8 +69,8 @@ class ShowLockingLanguageExternalModule extends AbstractExternalModule
 			echo "<script>";
 				echo $this->generateJavascriptFunctions()."
 					$(document).ready(function() {
-					$('#__LOCKRECORD__').before('<a style=\"padding-right:8px;cursor:pointer;\" tabindex=\'-1\' id=\"vcc_module_lock_history\" title=\"View Locking History\" onmouseover=\"dh1(this)\" onmouseout=\"dh2(this)\"><img src=\'".APP_PATH_IMAGES."history.png\'></a><br/><a title=\"View Locking Comment Log\" id=\"vcc_module_lock_data_res\" tabindex=\"-1\"><img src=\"".APP_PATH_IMAGES."balloon_left_bw2.gif\" /></a>');
-					$('#esignchk').prepend('<a style=\"padding-right:5px;cursor:pointer;\" tabindex=\'-1\' id=\"vcc_module_esig_history\" title=\"View E-Signature History\" onmouseover=\"dh1(this)\" onmouseout=\"dh2(this)\"><img src=\'".APP_PATH_IMAGES."history.png\'></a><br/><a id=\"vcc_module_esig_data_res\" title=\"View Esignature Comment Log\" tabindex=\"-1\"><img src=\"".APP_PATH_IMAGES."balloon_left_bw2.gif\" /></a>');
+					$('#__LOCKRECORD__').before('<div style=\"display:inline-block;padding-right:5px;\"><a style=\"padding-right:8px;cursor:pointer;\" tabindex=\'-1\' id=\"vcc_module_lock_history\" title=\"View Locking History\" onmouseover=\"dh1(this)\" onmouseout=\"dh2(this)\"><img src=\'".APP_PATH_IMAGES."history.png\'></a><br/><a title=\"View Locking Comment Log\" id=\"vcc_module_lock_data_res\" tabindex=\"-1\"><img src=\"".APP_PATH_IMAGES.$lockIcon."\" /></a></div>');
+					$('#esignchk').prepend('<div style=\"display:inline-block;padding-right:5px;\"><a style=\"padding-right:5px;cursor:pointer;\" tabindex=\'-1\' id=\"vcc_module_esig_history\" title=\"View E-Signature History\" onmouseover=\"dh1(this)\" onmouseout=\"dh2(this)\"><img src=\'".APP_PATH_IMAGES."history.png\'></a><br/><a id=\"vcc_module_esig_data_res\" title=\"View Esignature Comment Log\" tabindex=\"-1\"><img src=\"".APP_PATH_IMAGES.$esigIcon."\" /></a></div>');
 				
 					$(\"#vcc_module_lock_history\").click(function () {
 						lockHist(\"locking\",\"$record\",$event_id,$repeat_instance,$project_id);
@@ -144,6 +152,10 @@ class ShowLockingLanguageExternalModule extends AbstractExternalModule
 		return $recordSignData;
 	}
 
+	/*
+	 * Function to generate javascript functions on the data entry form that generate/show the comment log/data resolution popup and the lock/esignature history popup. These are modified versions of the one for base REDCap, done to get around the lock/esignature fields not being actual fields in the project metadata. Makes calls to our custom code to create the actual popups.
+	 * @return String that contains the lockHist, lockResPopup, and lockResolutionSave javascript functions.
+	 * */
 	function generateJavascriptFunctions() {
 		return "function lockHist(type,record,event_id,instance,pid) {
 						// Get window scroll position before we load dialog content
@@ -330,5 +342,65 @@ class ShowLockingLanguageExternalModule extends AbstractExternalModule
 							}
 						});
 					}";
+	}
+
+	/*
+	 * This mimics the REDCap functionality of determining what icon needs to be used for a certain status in the data resolution workflow. Required because these fields aren't in the project, and to extremely streamline the process of determining the icon.
+	 * @param $projectID The project being used.
+	 * @param $record Record ID of the record being examined.
+	 * @param $eventID Event ID of the form.
+	 * @param $fieldName Field name to check status of. Will either be 'locking_data_resolution' or 'esignature_data_resolution'
+	 * @param $instance Instance ID of the form.
+	 * @return Filename of the icon image to use for the status. Does not include the path to the image.
+	 */
+	function getCommentLogIcon($projectID, $record, $eventID, $fieldName, $instance = '1') {
+		// This is used in comment logs or any data resolution that hasn't been started yet.
+		$icon = "balloon_left_bw2.gif";
+		$sql = "SELECT status_id, query_status
+			FROM redcap_data_quality_status
+			WHERE project_id=$projectID
+			AND record='$record'
+			AND event_id=$eventID
+			AND instance=$instance
+			AND field_name='$fieldName'";
+		$result = db_query($sql);
+		if ($result->num_rows > 0) {
+			$currentStatusID = "";
+			$currentStatus = "";
+			while ($row = db_fetch_assoc($result)) {
+				$currentStatus = $row['query_status'];
+				$currentStatusID = $row['status_id'];
+			}
+			switch ($currentStatus) {
+				case "OPEN":
+					// The icon used for an open data resolution depends on whether there have been responses to it
+					$openSql = "SELECT response
+						FROM redcap_data_quality_resolutions
+						WHERE status_id = $currentStatusID
+						AND response IS NOT NULL
+						ORDER BY ts DESC LIMIT 1";
+					$openResult = db_query($openSql);
+					if ($openResult->num_rows > 0) {
+						$icon = "balloon_exclamation_blue.gif";
+					}
+					else {
+						$icon = "balloon_exclamation.gif";
+					}
+					break;
+				case "CLOSED":
+					$icon = "balloon_tick.gif";
+					break;
+				case "VERIFIED":
+					$icon = "tick_circle.png";
+					break;
+				case "DEVERIFIED":
+					$icon = "exclamation_red.png";
+					break;
+				default:
+					$icon = "balloon_left.png";
+			}
+		}
+
+		return $icon;
 	}
 }

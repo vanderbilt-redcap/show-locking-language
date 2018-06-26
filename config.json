@@ -29,6 +29,11 @@
       "key": "show_history",
       "name": "Create History Popup for Locking and Esignatures",
       "type": "checkbox"
+    },
+    {
+      "key": "show_lock",
+      "name": "Show Lock Language to Those Without Locking Rights",
+      "type": "checkbox"
     }
   ],
 
