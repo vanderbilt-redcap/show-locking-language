@@ -16,7 +16,7 @@ class ShowLockingLanguageExternalModule extends AbstractExternalModule
 	function redcap_data_entry_form($project_id, $record, $instrument, $event_id, $group_id = NULL, $repeat_instance = 1) {
 		global $user_rights;
 		$showLock = $this->getProjectSetting('show_lock');
-		if ($showLock == "0" && $user_rights['lock_record'] == "0") return;
+		if ($showLock != "1" && $user_rights['lock_record'] == "0") return;
 
 		#Get the icons that correspond to the comment log / data resolution for the lock and esignature. Only relevent if the module is set to show the history and comment logs for these.
 		$lockIcon = $this->getCommentLogIcon($project_id,$record,$event_id,'locking_data_resolution',$repeat_instance);
