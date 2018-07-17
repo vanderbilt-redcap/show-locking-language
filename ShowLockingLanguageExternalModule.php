@@ -197,7 +197,7 @@ class ShowLockingLanguageExternalModule extends AbstractExternalModule
 						showProgress(1,0);
 						// Get dialog content via ajax
 					
-						$.post(\"".$this->getUrl('lock_comment_log_popup.php')."\", { rule_id: rule_id, action: 'view', field_name: field, event_id: event_id, record: record, existing_record: existing_record, pid: pid }, function(data){
+						$.post(\"".$this->getUrl('lock_comment_log_popup.php')."\", { rule_id: rule_id, action: 'view', field_name: field, event_id: event_id, record: record, existing_record: existing_record, instance: instance, pid: pid }, function(data){
 							showProgress(0,0);
 							// Parse JSON
 							var json_data = jQuery.parseJSON(data);
@@ -287,7 +287,8 @@ class ShowLockingLanguageExternalModule extends AbstractExternalModule
 							assigned_user_id: (($('#dc-assigned_user_id').length) ? $('#dc-assigned_user_id').val() : ''),
 							status: query_status, send_back: send_back,
 							response: response, reopen_query: reopen_query,
-							rule_id: rule_id
+							rule_id: rule_id,
+							instance: instance
 						}, function(data){
 							if (data=='0') {
 								alert(woops);

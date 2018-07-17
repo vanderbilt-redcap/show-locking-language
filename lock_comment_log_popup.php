@@ -21,6 +21,7 @@ $action = $_POST['action'];
 $field = $_POST['field_name'];
 $event_id = $_POST['event_id'];
 $record = label_decode($_POST['record']);
+$instance = is_numeric($_POST['instance']) ? (int)$_POST['instance'] : 1;
 $project_id = $_POST['pid'];
 
 // Instantiate DataQuality object
@@ -54,10 +55,9 @@ if ($_POST['action'] == 'view')
 				RCView::button(array('class'=>"jqbutton", 'style'=>'padding: 0.4em 0.8em !important;', 'onclick'=>"$('#lock_data_resolution').dialog('close');"), $lang['global_53'])
 			);
 		$title = ($data_resolution_enabled == '1') ? $lang['dataqueries_168'] : $lang['dataqueries_167'];
-		$title = "My Title!<br/>";
 	} else {
 		// Display the full history of this record's field + form for adding more comments/data queries
-		$content = $lq->displayFieldDataResHistory($record, $event_id, $field, $_POST['rule_id'], $_GET['instance']);
+		$content = $lq->displayFieldDataResHistory($record, $event_id, $field, $_POST['rule_id'], $instance);
 	}
 	## Output JSON
 	print json_encode_rc(array('content'=>$content, 'title'=>$title));
@@ -116,7 +116,7 @@ elseif ($_POST['action'] == 'save')
 	// Insert new or update existing
 	$sql = "insert into redcap_data_quality_status (rule_id, non_rule, project_id, record, event_id, field_name, query_status, assigned_user_id, instance)
 			values (".checkNull($rule_id).", ".checkNull($non_rule).", " . PROJECT_ID . ", '" . db_escape($record) . "',
-			$event_id, " . checkNull($field) . ", ".checkNull($dr_status).", ".checkNull($_POST['assigned_user_id']).", '" . db_escape($_GET['instance']) . "')
+			$event_id, " . checkNull($field) . ", ".checkNull($dr_status).", ".checkNull($_POST['assigned_user_id']).", '" . db_escape($instance) . "')
 			on duplicate key update query_status = ".checkNull($dr_status).", status_id = LAST_INSERT_ID(status_id)";
 	if (db_query($sql))
 	{

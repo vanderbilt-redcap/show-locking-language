@@ -21,7 +21,7 @@ $event_id = $_POST['event_id'];
 $lockType = $_POST['type'];
 $lockModuleLang = parse_ini_file("lock_module_language.ini");
 // Set $instance
-$instance = is_numeric($_POST['instance']) ? (int)$_POST : 1;
+$instance = is_numeric($_POST['instance']) ? (int)$_POST['instance'] : 1;
 // Get data history log
 $time_value_array = getDataHistoryLog($project_id, $record, $event_id, $lockType, $instance);
 // Get highest array key
@@ -119,7 +119,7 @@ function getDataHistoryLog($project_id, $record, $event_id, $type, $instance=1)
 		$description = $row['description'];
 		// Need to try to parse the instance of the log event to match the instance we're looking for
 		if ($description == "Unlock record" || $description == "Negate e-signature") {
-			if (strpos($sqlLog,"instance = '$instance'") !== 0) {
+			if (strpos($sqlLog,"instance = '$instance'") !== false) {
 				$matchedThisRow = true;
 			}
 		}
@@ -129,7 +129,7 @@ function getDataHistoryLog($project_id, $record, $event_id, $type, $instance=1)
 			$valueSplit = explode(",",$outputSql[1][1]);
 			$instanceIndex = "";
 			foreach ($columnsSplit as $index => $columnName) {
-				if (strpos($columnName,"instance") !== 0) {
+				if (strpos($columnName,"instance") !== false) {
 					$instanceIndex = $index;
 				}
 			}
