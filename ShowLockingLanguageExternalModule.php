@@ -19,8 +19,8 @@ class ShowLockingLanguageExternalModule extends AbstractExternalModule
 		if ($showLock != "1" && $user_rights['lock_record'] == "0") return;
 
 		#Get the icons that correspond to the comment log / data resolution for the lock and esignature. Only relevent if the module is set to show the history and comment logs for these.
-		$lockIcon = $this->getCommentLogIcon($project_id,$record,$event_id,'locking_data_resolution',$repeat_instance);
-		$esigIcon = $this->getCommentLogIcon($project_id,$record,$event_id,'esignature_data_resolution',$repeat_instance);
+		$lockIcon = $this->getCommentLogIcon($project_id,$record,$event_id,'locking_data_resolution_'.$instrument,$repeat_instance);
+		$esigIcon = $this->getCommentLogIcon($project_id,$record,$event_id,'esignature_data_resolution_'.$instrument,$repeat_instance);
 		#Determine if the module needs to show the comment log / data resolution and locking/esingature history on the data entry forms.
 		$showHistory = $this->getProjectSetting('show_history');
 		#Get the lock data for the form for this record,event,instance
@@ -48,16 +48,16 @@ class ShowLockingLanguageExternalModule extends AbstractExternalModule
 					$('#__ESIGNATURE__').before('".($showHistory == "1" ? "<div style=\"display:inline-block;padding-right:5px;\"><a style=\"padding-right:5px;cursor:pointer;\" tabindex=\'-1\' id=\"vcc_module_esig_history\" title=\"View E-Signature History\" onmouseover=\"dh1(this)\" onmouseout=\"dh2(this)\"><img src=\'".APP_PATH_IMAGES."history.png\'></a><br/><a id=\"vcc_module_esig_data_res\" href=\"javascript:;\" title=\"View Esignature Comment Log\" tabindex=\"-1\"><img src=\"".APP_PATH_IMAGES.$esigIcon."\" /></a></div>" : "")."');
 				}
 				$(\"#vcc_module_lock_history\").click(function () {
-					lockHist(\"locking\",\"$record\",$event_id,$repeat_instance,$project_id);
+					lockHist(\"locking\",\"$record\",$event_id,$repeat_instance,$project_id,\"$instrument\");
 				});
 				$(\"#vcc_module_esig_history\").click(function () {
-					lockHist(\"esignatures\",\"$record\",$event_id,$repeat_instance,$project_id);
+					lockHist(\"esignatures\",\"$record\",$event_id,$repeat_instance,$project_id,\"$instrument\");
 				});
 				$(\"#vcc_module_lock_data_res\").click(function () {
-					lockResPopup(\"locking_data_resolution\",$event_id,\"$record\",null,null,$repeat_instance,$project_id);
+					lockResPopup(\"locking_data_resolution\",$event_id,\"$record\",null,null,$repeat_instance,$project_id,\"$instrument\");
 				});
 				$(\"#vcc_module_esig_data_res\").click(function () {
-					lockResPopup(\"esignature_data_resolution\",$event_id,\"$record\",null,null,$repeat_instance,$project_id);
+					lockResPopup(\"esignature_data_resolution\",$event_id,\"$record\",null,null,$repeat_instance,$project_id,\"$instrument\");
 				});
 				
 				$('#__LOCKRECORD__-tr').css('display','table-row');";
@@ -73,17 +73,17 @@ class ShowLockingLanguageExternalModule extends AbstractExternalModule
 					$('#esignchk').prepend('<div style=\"display:inline-block;padding-right:5px;\"><a style=\"padding-right:5px;cursor:pointer;\" tabindex=\'-1\' id=\"vcc_module_esig_history\" title=\"View E-Signature History\" onmouseover=\"dh1(this)\" onmouseout=\"dh2(this)\"><img src=\'".APP_PATH_IMAGES."history.png\'></a><br/><a id=\"vcc_module_esig_data_res\" title=\"View Esignature Comment Log\" tabindex=\"-1\"><img src=\"".APP_PATH_IMAGES.$esigIcon."\" /></a></div>');
 				
 					$(\"#vcc_module_lock_history\").click(function () {
-						lockHist(\"locking\",\"$record\",$event_id,$repeat_instance,$project_id);
+						lockHist(\"locking\",\"$record\",$event_id,$repeat_instance,$project_id,\"$instrument\");
 					});
 					$(\"#vcc_module_esig_history\").click(function () {
-						lockHist(\"esignatures\",\"$record\",$event_id,$repeat_instance,$project_id);
+						lockHist(\"esignatures\",\"$record\",$event_id,$repeat_instance,$project_id,\"$instrument\");
 					});
 					
 					$(\"#vcc_module_lock_data_res\").click(function () {
-						lockResPopup(\"locking_data_resolution\",$event_id,\"$record\",null,null,$repeat_instance,$project_id);
+						lockResPopup(\"locking_data_resolution\",$event_id,\"$record\",null,null,$repeat_instance,$project_id,\"$instrument\");
 					});
 					$(\"#vcc_module_esig_data_res\").click(function () {
-						lockResPopup(\"esignature_data_resolution\",$event_id,\"$record\",null,null,$repeat_instance,$project_id);
+						lockResPopup(\"esignature_data_resolution\",$event_id,\"$record\",null,null,$repeat_instance,$project_id,\"$instrument\");
 					});
 					
 					$('#__LOCKRECORD__-tr').css('display','table-row');";
@@ -157,7 +157,7 @@ class ShowLockingLanguageExternalModule extends AbstractExternalModule
 	 * @return String that contains the lockHist, lockResPopup, and lockResolutionSave javascript functions.
 	 * */
 	function generateJavascriptFunctions() {
-		return "function lockHist(type,record,event_id,instance,pid) {
+		return "function lockHist(type,record,event_id,instance,pid,instrument) {
 						// Get window scroll position before we load dialog content
 						var windowScrollTop = $(window).scrollTop();
 						if (record == null) record = decodeURIComponent(getParameterByName('id'));
@@ -167,7 +167,7 @@ class ShowLockingLanguageExternalModule extends AbstractExternalModule
 						$('#data_history').dialog({ bgiframe: true, title: 'History of '+type+' for record \"'+record+'\"', modal: true, width: 650, zIndex: 3999, buttons: {
 							Close: function() { $(this).dialog('destroy'); } }
 						});
-						$.post(\"".$this->getUrl('lock_history_popup.php')."\", {type: type, event_id: event_id, record: record, instance: instance, pid: pid }, function(data){
+						$.post(\"".$this->getUrl('lock_history_popup.php')."\", {type: type, event_id: event_id, record: record, instance: instance, pid: pid, instrument: instrument }, function(data){
 							$('#data_history2').html(data);
 							// Adjust table height within the dialog to fit
 							var tableHeightMax = 300;
@@ -187,7 +187,7 @@ class ShowLockingLanguageExternalModule extends AbstractExternalModule
 							}
 						});
 					}
-				function lockResPopup(field,event_id,record,existing_record,rule_id,instance,pid) {
+				function lockResPopup(field,event_id,record,existing_record,rule_id,instance,pid,instrument) {
 						if (typeof instance == \"undefined\") instance = 1;
 						if (record == null) record = getParameterByName('id');
 						if (existing_record == null) existing_record = $('form#form :input[name=\"hidden_edit_flag\"]').val();
@@ -197,7 +197,7 @@ class ShowLockingLanguageExternalModule extends AbstractExternalModule
 						showProgress(1,0);
 						// Get dialog content via ajax
 					
-						$.post(\"".$this->getUrl('lock_comment_log_popup.php')."\", { rule_id: rule_id, action: 'view', field_name: field, event_id: event_id, record: record, existing_record: existing_record, instance: instance, pid: pid }, function(data){
+						$.post(\"".$this->getUrl('lock_comment_log_popup.php')."\", { rule_id: rule_id, action: 'view', field_name: field, event_id: event_id, record: record, existing_record: existing_record, instance: instance, pid: pid, instrument: instrument }, function(data){
 							showProgress(0,0);
 							// Parse JSON
 							var json_data = jQuery.parseJSON(data);

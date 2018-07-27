@@ -19,11 +19,12 @@ $project_id = $_POST['pid'];
 $record = db_escape($_POST['record']);
 $event_id = $_POST['event_id'];
 $lockType = $_POST['type'];
+$instrument = $_POST['instrument'];
 $lockModuleLang = parse_ini_file("lock_module_language.ini");
 // Set $instance
 $instance = is_numeric($_POST['instance']) ? (int)$_POST['instance'] : 1;
 // Get data history log
-$time_value_array = getDataHistoryLog($project_id, $record, $event_id, $lockType, $instance);
+$time_value_array = getDataHistoryLog($project_id, $record, $event_id, $lockType, $instrument, $instance);
 // Get highest array key
 $max_dh_key = count($time_value_array)-1;
 // Loop through all rows and add to $rows
@@ -77,7 +78,7 @@ $table .= RCView::div(array('id'=>'data_history3', 'style'=>'overflow:auto;'),
 echo $table;
 
 // Retrieve all logging that has been done in regards to the $type of 'lock' or 'esignature'
-function getDataHistoryLog($project_id, $record, $event_id, $type, $instance=1)
+function getDataHistoryLog($project_id, $record, $event_id, $type, $instrument, $instance=1)
 {
 	global $double_data_entry, $user_rights, $longitudinal;
 
@@ -119,7 +120,7 @@ function getDataHistoryLog($project_id, $record, $event_id, $type, $instance=1)
 		$description = $row['description'];
 		// Need to try to parse the instance of the log event to match the instance we're looking for
 		if ($description == "Unlock record" || $description == "Negate e-signature") {
-			if (strpos($sqlLog,"instance = '$instance'") !== false) {
+			if (strpos($sqlLog,"instance = '$instance'") !== false && strpos($sqlLog,"form_name = '$instrument'") !== false) {
 				$matchedThisRow = true;
 			}
 		}
@@ -128,13 +129,18 @@ function getDataHistoryLog($project_id, $record, $event_id, $type, $instance=1)
 			$columnsSplit = explode(",",$outputSql[1][0]);
 			$valueSplit = explode(",",$outputSql[1][1]);
 			$instanceIndex = "";
+			$formNameIndex = "";
 			foreach ($columnsSplit as $index => $columnName) {
 				if (strpos($columnName,"instance") !== false) {
 					$instanceIndex = $index;
 				}
+				elseif (strpos($columnName,"form_name") !== false) {
+					$formNameIndex = $index;
+				}
 			}
 			$preparedSqlInstance = str_replace(array("'"," "),"",$valueSplit[$instanceIndex]);
-			if ((int)$preparedSqlInstance === (int)$instance) {
+			$preparedSqlForm = str_replace(array("'"," "),"",$valueSplit[$formNameIndex]);
+			if ((int)$preparedSqlInstance === (int)$instance && $preparedSqlForm == $instrument) {
 				$matchedThisRow = true;
 			}
 		}

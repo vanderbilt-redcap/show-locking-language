@@ -38,6 +38,7 @@ class LockDataQuality extends \DataQuality
 		$this->loadRules();
 		// Obtain data cleaner history  as array
 		$drw_history = $this->getFieldDataResHistory($record, $event_id, $field, $rule_id, $instance);
+
 		$drw_history_count = count($drw_history);
 
 		// If using full DRW, then INTERWEAVE DATA HISTORY LOG into the comments

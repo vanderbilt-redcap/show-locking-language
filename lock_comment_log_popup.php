@@ -18,10 +18,11 @@ $_POST['record'] = html_entity_decode(urldecode($_POST['record']), ENT_QUOTES);
 
 $rule_id = $_POST['rule_id'];
 $action = $_POST['action'];
-$field = $_POST['field_name'];
+$field = $_POST['field_name'].($_POST['instrument'] != "" ? "_".$_POST['instrument'] : "");
 $event_id = $_POST['event_id'];
 $record = label_decode($_POST['record']);
 $instance = is_numeric($_POST['instance']) ? (int)$_POST['instance'] : 1;
+$instrument = $_POST['instrument'];
 $project_id = $_POST['pid'];
 
 // Instantiate DataQuality object
