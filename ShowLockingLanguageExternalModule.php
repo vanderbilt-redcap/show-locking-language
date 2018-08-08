@@ -14,7 +14,7 @@ use ExternalModules\ExternalModules;
 class ShowLockingLanguageExternalModule extends AbstractExternalModule
 {
 	function redcap_data_entry_form($project_id, $record, $instrument, $event_id, $group_id = NULL, $repeat_instance = 1) {
-		global $user_rights;
+		global $user_rights,$lang;
 		$showLock = $this->getProjectSetting('show_lock');
 		if ($showLock != "1" && $user_rights['lock_record'] == "0") return;
 
@@ -66,11 +66,19 @@ class ShowLockingLanguageExternalModule extends AbstractExternalModule
 		}
 		// If the form is not locked but we want to see the locking history, need to add them to the existing lock/unlock div
 		elseif ($showHistory == "1") {
+            $esigData = $this->getESignatureData($project_id, $instrument, $record, $event_id, $repeat_instance);
 			echo "<script>";
 				echo $this->generateJavascriptFunctions()."
 					$(document).ready(function() {
-					$('#__LOCKRECORD__').before('<div style=\"display:inline-block;padding-right:5px;\"><a style=\"padding-right:8px;cursor:pointer;\" tabindex=\'-1\' id=\"vcc_module_lock_history\" title=\"View Locking History\" onmouseover=\"dh1(this)\" onmouseout=\"dh2(this)\"><img src=\'".APP_PATH_IMAGES."history.png\'></a><br/><a title=\"View Locking Comment Log\" id=\"vcc_module_lock_data_res\" tabindex=\"-1\"><img src=\"".APP_PATH_IMAGES.$lockIcon."\" /></a></div>');
-					$('#esignchk').prepend('<div style=\"display:inline-block;padding-right:5px;\"><a style=\"padding-right:5px;cursor:pointer;\" tabindex=\'-1\' id=\"vcc_module_esig_history\" title=\"View E-Signature History\" onmouseover=\"dh1(this)\" onmouseout=\"dh2(this)\"><img src=\'".APP_PATH_IMAGES."history.png\'></a><br/><a id=\"vcc_module_esig_data_res\" title=\"View Esignature Comment Log\" tabindex=\"-1\"><img src=\"".APP_PATH_IMAGES.$esigIcon."\" /></a></div>');
+					if ($('#__LOCKRECORD__-tr').length == 0) {
+					    $('#" . $instrument . "_complete-tr').after('<tr id=\"__LOCKRECORD__-tr\" sq_id=\"__LOCKRECORD__\"><td class=\"labelrc col-xs-7\"><label class=\"fl\" id=\"label-__LOCKRECORD__\" aria-hidden=\"true\"></td><td class=\"data col-xs-5\" style=\"padding:5px;\"><div id=\"__LOCKRECORD__\"></div><div id=\"esignchk\"></div></div></td></tr>');
+					    $('#__LOCKRECORD__').before('<div><div style=\"display:inline-block;padding-right:5px;\"><a style=\"padding-right:8px;cursor:pointer;\" tabindex=\'-1\' id=\"vcc_module_lock_history\" title=\"View Locking History\" onmouseover=\"dh1(this)\" onmouseout=\"dh2(this)\"><img src=\'".APP_PATH_IMAGES."history.png\'></a><br/><a title=\"View Locking Comment Log\" id=\"vcc_module_lock_data_res\" tabindex=\"-1\"><img src=\"".APP_PATH_IMAGES.$lockIcon."\" /></a></div><div style=\"display:inline-block;\">&nbsp;<img src=\"".APP_PATH_IMAGES."lock.png\" /><b style=\"color:#A86700\">Lock</b></div></div>');
+					    $('#esignchk').prepend('<div style=\"display:inline-block;padding-right:5px;\"><a style=\"padding-right:5px;cursor:pointer;\" tabindex=\'-1\' id=\"vcc_module_esig_history\" title=\"View E-Signature History\" onmouseover=\"dh1(this)\" onmouseout=\"dh2(this)\"><img src=\'".APP_PATH_IMAGES."history.png\'></a><br/><a id=\"vcc_module_esig_data_res\" title=\"View Esignature Comment Log\" tabindex=\"-1\"><img src=\"".APP_PATH_IMAGES.$esigIcon."\" /></a></div><div style=\"display:inline-block;color:#008000;\">&nbsp;<img src=\"".APP_PATH_IMAGES."tick_shield.png\" /><b style=\"color:#A86700\">E-signature</b> <span style=\"color:#444;font-weight:normal;\">(<a style=\"text-decoration:underline;font-size:10px;font-family:tahoma;\" href=\"javascript:;\" onclick=\"esignExplainLink(); return false;\">".$lang['form_renderer_02']."</a>)</span></div></div>');
+				    }
+				    else {
+				        $('#__LOCKRECORD__').before('<div style=\"display:inline-block;padding-right:5px;\"><a style=\"padding-right:8px;cursor:pointer;\" tabindex=\'-1\' id=\"vcc_module_lock_history\" title=\"View Locking History\" onmouseover=\"dh1(this)\" onmouseout=\"dh2(this)\"><img src=\'".APP_PATH_IMAGES."history.png\'></a><br/><a title=\"View Locking Comment Log\" id=\"vcc_module_lock_data_res\" tabindex=\"-1\"><img src=\"".APP_PATH_IMAGES.$lockIcon."\" /></a></div>');
+				        $('#esignchk').prepend('<div style=\"display:inline-block;padding-right:5px;\"><a style=\"padding-right:5px;cursor:pointer;\" tabindex=\'-1\' id=\"vcc_module_esig_history\" title=\"View E-Signature History\" onmouseover=\"dh1(this)\" onmouseout=\"dh2(this)\"><img src=\'".APP_PATH_IMAGES."history.png\'></a><br/><a id=\"vcc_module_esig_data_res\" title=\"View Esignature Comment Log\" tabindex=\"-1\"><img src=\"".APP_PATH_IMAGES.$esigIcon."\" /></a></div>');
+				    }
 				
 					$(\"#vcc_module_lock_history\").click(function () {
 						lockHist(\"locking\",\"$record\",$event_id,$repeat_instance,$project_id,\"$instrument\");
@@ -113,7 +121,7 @@ class ShowLockingLanguageExternalModule extends AbstractExternalModule
 		AND d.form_name='" . $form. "'
 		AND d.event_id='".$eventID."'
 		AND d.instance='".$instance."'
-		AND d.record=" . $recordID;
+		AND d.record='" . $recordID."'";
 		//echo "$sql<br/>";
 		//echo "alert(\"".$sql."\")";
 		$result = db_query($sql);
