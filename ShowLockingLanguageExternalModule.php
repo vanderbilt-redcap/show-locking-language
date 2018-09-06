@@ -125,7 +125,7 @@ class ShowLockingLanguageExternalModule extends AbstractExternalModule
 		AND d.record='" . $recordID."'";
 		//echo "$sql<br/>";
 		//echo "alert(\"".$sql."\")";
-		$result = db_query($sql);
+		$result = $this->query($sql);
 		while ($row = db_fetch_assoc($result)) {
 			$recordLockData[$recordID] = $row;
 		}
@@ -154,7 +154,7 @@ class ShowLockingLanguageExternalModule extends AbstractExternalModule
 		AND d.record='" . $recordID."'";
 		//echo "$sql<br/>";
 		//echo "alert(\"".$sql."\")";
-		$result = db_query($sql);
+		$result = $this->query($sql);
 		while ($row = db_fetch_assoc($result)) {
 			$recordSignData[$recordID] = $row;
 		}
@@ -373,7 +373,7 @@ class ShowLockingLanguageExternalModule extends AbstractExternalModule
 			AND event_id=$eventID
 			AND instance=$instance
 			AND field_name='$fieldName'";
-		$result = db_query($sql);
+		$result = $this->query($sql);
 		if ($result->num_rows > 0) {
 			$currentStatusID = "";
 			$currentStatus = "";
@@ -389,7 +389,7 @@ class ShowLockingLanguageExternalModule extends AbstractExternalModule
 						WHERE status_id = $currentStatusID
 						AND response IS NOT NULL
 						ORDER BY ts DESC LIMIT 1";
-					$openResult = db_query($openSql);
+					$openResult = $this->query($openSql);
 					if ($openResult->num_rows > 0) {
 						$icon = "balloon_exclamation_blue.gif";
 					}

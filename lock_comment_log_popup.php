@@ -102,7 +102,7 @@ elseif ($_POST['action'] == 'save')
 		// Delete from table (i.e. set delete field to NOW)
 		$sql = "update redcap_edocs_metadata set delete_date = '".NOW."' where project_id = " . PROJECT_ID . "
 				and delete_date is null and doc_id in (" . prep_implode($delete_docs_ids) . ")";
-		db_query($sql);
+		$lq->query($sql);
 	}
 
 	// If query was just closed BUT a file was uploaded in the response, then delete that file
@@ -111,7 +111,7 @@ elseif ($_POST['action'] == 'save')
 		// Delete from table (i.e. set delete field to NOW)
 		$sql = "update redcap_edocs_metadata set delete_date = '".NOW."' where project_id = " . PROJECT_ID . "
 				and delete_date is null and doc_id = '" . db_escape($_POST['upload_doc_id']) . "'";
-		db_query($sql);
+		$lq->query($sql);
 	}
 
 	// Insert new or update existing
@@ -119,7 +119,7 @@ elseif ($_POST['action'] == 'save')
 			values (".checkNull($rule_id).", ".checkNull($non_rule).", " . PROJECT_ID . ", '" . db_escape($record) . "',
 			$event_id, " . checkNull($field) . ", ".checkNull($dr_status).", ".checkNull($_POST['assigned_user_id']).", '" . db_escape($instance) . "')
 			on duplicate key update query_status = ".checkNull($dr_status).", status_id = LAST_INSERT_ID(status_id)";
-	if (db_query($sql))
+	if ($lq->query($sql))
 	{
 		// Get cleaner_id
 		$status_id = db_insert_id();
@@ -131,7 +131,7 @@ elseif ($_POST['action'] == 'save')
 				values ($status_id, '".NOW."', ".checkNull($userInitiator['ui_id']).",
 				".checkNull($_POST['response_requested']).", ".checkNull($_POST['response']).",
 				".checkNull(trim(label_decode($_POST['comment']))).", ".checkNull($dr_status).", ".checkNull($_POST['upload_doc_id']).")";
-		if (db_query($sql)) {
+		if ($lq->query($sql)) {
 			// Success, so return content via JSON to redisplay with new changes made
 			$res_id = db_insert_id();
 			## SET RETURN ELEMENTS

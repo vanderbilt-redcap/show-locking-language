@@ -26,6 +26,11 @@ class LockDataQuality extends \DataQuality
 	 * @param $instance Instance ID of the form.
 	 * @return Array with keys of record ID, and elements of ld_id ('Lock ID'), timestamp (when locking happened), label (custom label for locking, if present), username (User Name of person who performed lock), realName (Real name of the user who locked)
 	 */
+	public function query($sql) {
+        $lockModule = new ShowLockingLanguageExternalModule;
+        return $lockModule->query($sql);
+    }
+
 	public function displayFieldDataResHistory($record, $event_id, $field, $rule_id='', $instance=1)
 	{
 		global $longitudinal, $lang, $table_pk_label, $Proj, $user_rights, $data_resolution_enabled, $double_data_entry, $field_comment_edit_delete;
@@ -577,7 +582,7 @@ class LockDataQuality extends \DataQuality
 		$userUploadedFile = (isset($attr['upload_doc_id']) && $attr['upload_doc_id'] != '');
 		// Get uploaded file name and size (if applicable)
 		if ($userUploadedFile) {
-			$q_fileup_query = db_query("select doc_name, doc_size from redcap_edocs_metadata where doc_id = {$attr['upload_doc_id']} limit 1");
+			$q_fileup_query = self::query("select doc_name, doc_size from redcap_edocs_metadata where doc_id = {$attr['upload_doc_id']} limit 1");
 			$q_fileup = db_fetch_array($q_fileup_query);
 			$q_fileup['doc_size'] = round_up($q_fileup['doc_size'] / 1024 / 1024);
 			if (strlen($q_fileup['doc_name']) > 24) $q_fileup['doc_name'] = substr($q_fileup['doc_name'],0,22)."...";

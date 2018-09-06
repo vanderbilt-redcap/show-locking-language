@@ -80,7 +80,7 @@ echo $table;
 // Retrieve all logging that has been done in regards to the $type of 'lock' or 'esignature'
 function getDataHistoryLog($project_id, $record, $event_id, $type, $instrument, $instance=1)
 {
-	global $double_data_entry, $user_rights, $longitudinal;
+	global $double_data_entry, $user_rights, $longitudinal, $module;
 
 	$field_type = ($type == "esignatures" ? "ESIGNATURE" : "LOCK_RECORD");
 
@@ -98,7 +98,7 @@ function getDataHistoryLog($project_id, $record, $event_id, $type, $instrument, 
 			AND event IN ('$field_type','DELETE')
 			ORDER BY log_event_id";
 	//echo "$sql<br/>";
-	$q = db_query($sql);
+	$q = $module->query($sql);
 	// Loop through each row from log_event table. Each will become a row in the new table displayed.
 	while ($row = db_fetch_assoc($q)) {
 		// If the record was deleted in the past, then remove all activity before that point
