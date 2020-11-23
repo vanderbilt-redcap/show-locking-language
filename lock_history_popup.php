@@ -25,6 +25,7 @@ $lockModuleLang = parse_ini_file("lock_module_language.ini");
 $instance = is_numeric($_POST['instance']) ? (int)$_POST['instance'] : 1;
 // Get data history log
 $time_value_array = getDataHistoryLog($project_id, $record, $event_id, $lockType, $instrument, $instance);
+
 // Get highest array key
 $max_dh_key = count($time_value_array)-1;
 // Loop through all rows and add to $rows
@@ -89,9 +90,11 @@ function getDataHistoryLog($project_id, $record, $event_id, $type, $instrument, 
 		$record .= "--" . $user_rights['double_data'];
 	}
 
+    $log_event_table = method_exists('\REDCap', 'getLogEventTable') ? \REDCap::getLogEventTable($project_id) : "redcap_log_event";
+
 	// Retrieve history and parse field data values to obtain value for specific field
 	$sql = "SELECT log_event_id, project_id, timestamp(ts) as ts, user, event, sql_log, pk, event_id, description
-			FROM redcap_log_event
+			FROM $log_event_table
 			WHERE project_id=$project_id
 			AND pk = '$record'
 			AND (event_id = $event_id OR event_id IS NULL)

@@ -45,7 +45,6 @@ class ShowLockingLanguageExternalModule extends AbstractExternalModule
 				}
 				else {
 					$('#__LOCKRECORD__').before('".($showHistory == "1" ? "<div style=\"display:inline-block;padding-right:5px;\"><a style=\"padding-right:5px;cursor:pointer;\" tabindex=\'-1\' id=\"vcc_module_lock_history\" title=\"View Locking History\" onmouseover=\"dh1(this)\" onmouseout=\"dh2(this)\"><img src=\'".APP_PATH_IMAGES."history.png\'></a><br/><a title=\"View Locking Comment Log\" id=\"vcc_module_lock_data_res\" href=\"javascript:;\" tabindex=\"-1\"><img src=\"".APP_PATH_IMAGES.$lockIcon."\" /></a></div>" : "")."');
-					console.log('hello');
 					$('#__ESIGNATURE__').before('".($showHistory == "1" ? "<div style=\"display:inline-block;padding-right:5px;\"><a style=\"padding-right:5px;cursor:pointer;\" tabindex=\'-1\' id=\"vcc_module_esig_history\" title=\"View E-Signature History\" onmouseover=\"dh1(this)\" onmouseout=\"dh2(this)\"><img src=\'".APP_PATH_IMAGES."history.png\'></a><br/><a id=\"vcc_module_esig_data_res\" href=\"javascript:;\" title=\"View Esignature Comment Log\" tabindex=\"-1\"><img src=\"".APP_PATH_IMAGES.$esigIcon."\" /></a></div>" : "")."');
 				}
 				$(\"#vcc_module_lock_history\").click(function () {
