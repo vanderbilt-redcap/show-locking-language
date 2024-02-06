@@ -102,6 +102,9 @@ function getDataHistoryLog($project_id, $record, $event_id, $type, $instrument, 
 			ORDER BY log_event_id";
 	//echo "$sql<br/>";
 	$q = $module->query($sql);
+
+    $time_value_array = [];
+
 	// Loop through each row from log_event table. Each will become a row in the new table displayed.
 	while ($row = db_fetch_assoc($q)) {
 		// If the record was deleted in the past, then remove all activity before that point
